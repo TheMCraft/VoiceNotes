@@ -2,14 +2,15 @@ import SwiftUI
 import Speech
 
 struct ContentView: View {
-    @State var recognizedText = ""
+    @State private var recognizedText = ""
+    @State private var isRecording = false
     private let speechRecognizer = SFSpeechRecognizer()
     private let audioEngine = AVAudioEngine()
 
     var body: some View {
         VStack {
-            Button("Aufnahme") {
-                startRecording()
+            Button(isRecording ? "Stop" : "Aufnahme") {
+                isRecording ? stopRecording() : startRecording()
             }
             Text(recognizedText)
         }
@@ -17,20 +18,19 @@ struct ContentView: View {
 
     func startRecording() {
         let request = SFSpeechAudioBufferRecognitionRequest()
-        let inputNode = audioEngine.inputNode
-        audioEngine.prepare()
-        try? audioEngine.start()
-        speechRecognizer?.recognitionTask(with: request) { result, _ in
-            if let result = result {
-                recognizedText = result.bestTranscription.formattedString
-            }
-        }
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: inputNode.inputFormat(forBus: 0)) { buffer, _ in
+        audioEngine.inputNode.installTap(onBus: 0, bufferSize: 1024, format: audioEngine.inputNode.inputFormat(forBus: 0)) { buffer, _ in
             request.append(buffer)
         }
+        try? audioEngine.start()
+        speechRecognizer?.recognitionTask(with: request) { result, _ in
+            self.recognizedText = result?.bestTranscription.formattedString ?? ""
+        }
+        isRecording = true
     }
-}
 
-#Preview {
-    ContentView()
+    func stopRecording() {
+        audioEngine.stop()
+        audioEngine.inputNode.removeTap(onBus: 0)
+        isRecording = false
+    }
 }
