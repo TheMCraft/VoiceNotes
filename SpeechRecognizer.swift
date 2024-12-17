@@ -8,7 +8,7 @@ class SpeechRecognizer: ObservableObject {
     private var audioEngine: AVAudioEngine?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
-    private let speechRecognizer = SFSpeechRecognizer()
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "de-DE"))
     
     func requestAuthorization() {
         SFSpeechRecognizer.requestAuthorization { status in
@@ -40,7 +40,7 @@ class SpeechRecognizer: ObservableObject {
             }
         }
         
-        let inputNode = audioEngine.inputNode // Kein Optional
+        let inputNode = audioEngine.inputNode
         let recordingFormat = inputNode.outputFormat(forBus: 0)
         inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, _ in
             recognitionRequest.append(buffer)
@@ -56,10 +56,17 @@ class SpeechRecognizer: ObservableObject {
         audioEngine?.inputNode.removeTap(onBus: 0)
         recognitionRequest = nil
         recognitionTask = nil
+        deactivateAudioSession()
     }
     
     private func resetAudioSession() {
-        try? AVAudioSession.sharedInstance().setCategory(.record, mode: .measurement, options: .duckOthers)
-        try? AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+        let audioSession = AVAudioSession.sharedInstance()
+        try? audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+        try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+    }
+    
+    private func deactivateAudioSession() {
+        let audioSession = AVAudioSession.sharedInstance()
+        try? audioSession.setActive(false, options: .notifyOthersOnDeactivation)
     }
 }
