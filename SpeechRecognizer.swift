@@ -1,7 +1,7 @@
 import SwiftUI
 import Speech
 
-class MySpeechRecognizer: ObservableObject {
+class SpeechRecognizer: ObservableObject {
     @Published var recognizedText: String = ""
     @Published var isRecording: Bool = false
 

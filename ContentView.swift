@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var speechRecognizer = MySpeechRecognizer()
+    @StateObject private var speechRecognizer = SpeechRecognizer()
     
     var body: some View {
         VStack(spacing: 20) {
