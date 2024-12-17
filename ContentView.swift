@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var speechRecognizer = SpeechRecognizer()
+    private let textToSpeechManager = TextToSpeechManager()
     
     var body: some View {
         VStack(spacing: 20) {
@@ -21,6 +22,7 @@ struct ContentView: View {
                 } else {
                     speechRecognizer.requestAuthorization()
                     speechRecognizer.startRecording()
+                    speechRecognizer.recognizedText = ""
                 }
             }) {
                 Text(speechRecognizer.isRecording ? "Stop Recording" : "Start Recording")
@@ -31,10 +33,23 @@ struct ContentView: View {
                     .cornerRadius(10)
             }
             .padding()
+            
+            Button(action: {
+                textToSpeechManager.speak(text: speechRecognizer.recognizedText)
+            }) {
+                Text("Read Aloud")
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .cornerRadius(10)
+            }
+            .padding()
         }
         .padding()
     }
 }
+
 #Preview {
     ContentView()
 }
