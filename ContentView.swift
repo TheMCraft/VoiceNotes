@@ -35,7 +35,8 @@ struct ContentView: View {
             .padding()
             
             Button(action: {
-                textToSpeechManager.speak(text: speechRecognizer.recognizedText)
+                textToSpeechManager.printAvailableVoices()
+                textToSpeechManager.speak(text: speechRecognizer.recognizedText, voiceIdentifier: "com.apple.ttsbundle.siri_male_de-DE_compact")
             }) {
                 Text("Read Aloud")
                     .foregroundColor(.white)

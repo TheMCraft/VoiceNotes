@@ -1,15 +1,34 @@
 import AVFoundation
 
-final class TextToSpeechManager: NSObject, AVSpeechSynthesizerDelegate, @unchecked Sendable {
+@MainActor
+final class TextToSpeechManager: NSObject, AVSpeechSynthesizerDelegate {
     private let speechSynthesizer = AVSpeechSynthesizer()
     
-    func speak(text: String, language: String = "de-DE") {
-        guard !text.isEmpty else { return }
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: language)
-        
-        DispatchQueue.main.async {
-            self.speechSynthesizer.speak(utterance)
+    func printAvailableVoices() {
+        let voices = AVSpeechSynthesisVoice.speechVoices()
+        for voice in voices {
+            print("Voice Identifier: \(voice.identifier), Language: \(voice.language), Name: \(voice.name)")
         }
+    }
+    
+    func speak(text: String, language: String = "de-DE", voiceIdentifier: String? = nil) {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            print("Nothing to speak.")
+            return
+        }
+        
+        let utterance = AVSpeechUtterance(string: text)
+        if let voiceIdentifier = voiceIdentifier,
+           let voice = AVSpeechSynthesisVoice(identifier: voiceIdentifier) {
+            utterance.voice = voice
+        } else {
+            utterance.voice = AVSpeechSynthesisVoice(language: language)
+        }
+        
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+        
+        print("Trying to speak: \(text) with voice: \(utterance.voice?.name ?? "Default Voice")")
+        
+        speechSynthesizer.speak(utterance)
     }
 }
