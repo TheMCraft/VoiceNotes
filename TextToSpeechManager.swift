@@ -11,10 +11,14 @@ final class TextToSpeechManager: NSObject, AVSpeechSynthesizerDelegate {
         }
     }
     
-    func speak(text: String, language: String = "de-DE", voiceIdentifier: String? = nil) {
+    func speak(text: String, language: String = "de-DE", voiceIdentifier: String? = nil, force: Bool = true) {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             print("Nothing to speak.")
             return
+        }
+        
+        if (force) {
+            stopSpeaking()
         }
         
         let utterance = AVSpeechUtterance(string: text)
@@ -30,5 +34,9 @@ final class TextToSpeechManager: NSObject, AVSpeechSynthesizerDelegate {
         print("Trying to speak: \(text) with voice: \(utterance.voice?.name ?? "Default Voice")")
         
         speechSynthesizer.speak(utterance)
+    }
+    
+    func stopSpeaking() {
+        speechSynthesizer.stopSpeaking(at: .immediate)
     }
 }
