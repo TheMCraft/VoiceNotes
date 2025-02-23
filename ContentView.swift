@@ -11,17 +11,17 @@ struct ContentView: View {
     @State private var newItem = ""
     @State private var isSpeaking = false
     @State private var speakIndex: Int = 0
-    @State private var message = "wische"
     @State private var tapCount: Int = 0
     @State private var showInfo: Bool = false
     @State private var tutorial: Bool = false
     @GestureState private var isDetectingLongPress: Bool = false
     
-    private let bundleIdentifier: String = "com.apple.ttsbundle.siri_male_de-DE_compact"
+    private let bundleIdentifier: String = "com.apple.ttsbundle.siri_male_en-US_compact"
     
     
     var body: some View {
         ZStack() {
+            Text("Swipe down for information").foregroundColor(.black)
             Rectangle()
                 .font(.title)
                 .onLongPressGesture(minimumDuration: 1.0, perform: {
@@ -83,7 +83,7 @@ struct ContentView: View {
                                     }
                                 } else {
                                     if vertical > 0 {
-                                        message = "Wisch nach unten"
+                                        //TODO: tutorial
                                     } else {
                                         if (tapCount > 0) {
                                             array.remove(at: tapCount - 1)
@@ -100,7 +100,6 @@ struct ContentView: View {
                     loadNotes()
                 }
                 .frame(width: .infinity, height: .infinity)
-            Text(message + String(isSpeaking)).foregroundColor(.blue)
             if (showInfo) {
                 Rectangle().fill(.green).frame(width: 200, height: 200)
             }

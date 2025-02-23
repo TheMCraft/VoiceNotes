@@ -8,7 +8,7 @@ class SpeechRecognizer: ObservableObject {
     private var audioEngine: AVAudioEngine?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "de-DE"))
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
     
     func requestAuthorization() {
         SFSpeechRecognizer.requestAuthorization { status in
