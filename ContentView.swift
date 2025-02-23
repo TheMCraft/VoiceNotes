@@ -13,21 +13,26 @@ struct ContentView: View {
     @State private var speakIndex: Int = 0
     @State private var tapCount: Int = 0
     @State private var showInfo: Bool = false
-    @State private var tutorial: Bool = false
+    @State private var tutorialSpeaking: Bool = false
     @GestureState private var isDetectingLongPress: Bool = false
     
     private let bundleIdentifier: String = "com.apple.ttsbundle.siri_male_en-US_compact"
     
     
     var body: some View {
+        VStack {
+            Text("Swipe down for information").foregroundColor(.primary)
+            Button("View Notes") {
+                showInfo = !showInfo
+            }
+        }
         ZStack() {
-            Text("Swipe down for information").foregroundColor(.black)
             Rectangle()
-                .font(.title)
+                .fill(isSpeaking ? .green : .white)
                 .onLongPressGesture(minimumDuration: 1.0, perform: {
                     playBingSound()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         speechRecognizer.requestAuthorization()
                         speechRecognizer.startRecording()
                         speechRecognizer.recognizedText = ""
@@ -47,6 +52,7 @@ struct ContentView: View {
                     TapGesture(count: 1)
                         .onEnded {
                             if (array.count == 0) {
+                                tutorial()
                                 return
                             }
                             if tapCount >= array.count {
@@ -58,6 +64,7 @@ struct ContentView: View {
                                             DragGesture()
                             .onEnded { value in
                                 if (array.count == 0) {
+                                    tutorial()
                                     return
                                 }
                                 let horizontal = value.translation.width
@@ -71,9 +78,6 @@ struct ContentView: View {
                                         textToSpeechManager.speak(text: getMessage(numberize: true), voiceIdentifier: bundleIdentifier)
                                         speakIndex += 1
                                     } else {
-                                        if (tapCount == 0) {
-                                            return
-                                        }
                                         if speakIndex == 0 {
                                             speakIndex = array.count - 1
                                         }
@@ -83,9 +87,10 @@ struct ContentView: View {
                                     }
                                 } else {
                                     if vertical > 0 {
-                                        //TODO: tutorial
+                                        tutorial()
                                     } else {
                                         if (tapCount > 0) {
+                                            textToSpeechManager.speak(text: "Deleted note \(tapCount): \(array[tapCount - 1])", voiceIdentifier: bundleIdentifier)
                                             array.remove(at: tapCount - 1)
                                             tapCount = 0
                                             saveNotes()
@@ -99,9 +104,20 @@ struct ContentView: View {
                 .onAppear {
                     loadNotes()
                 }
-                .frame(width: .infinity, height: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             if (showInfo) {
-                Rectangle().fill(.green).frame(width: 200, height: 200)
+                Rectangle()
+                    .fill(.gray)
+                    .cornerRadius(20)
+                    .frame(maxWidth: UIScreen.main.bounds.width * 0.8,
+                           maxHeight: UIScreen.main.bounds.height * 0.8)
+                    .padding(UIScreen.main.bounds.width * 0.1)
+                    .overlay(
+                        List(array, id: \.self) { item in
+                            Text(item)
+                        }
+                        .padding()
+                    )
             }
         }
     }
@@ -125,6 +141,15 @@ struct ContentView: View {
     
     func playBingSound() {
         AudioServicesPlaySystemSound(1052)
+    }
+    func tutorial() {
+        if (tutorialSpeaking) {
+            textToSpeechManager.stopSpeaking()
+            tutorialSpeaking = false
+        } else {
+            tutorialSpeaking = true
+            textToSpeechManager.speak(text: "Press and hold your finger in the middle of the screen to add a new note... swipe to the right to read out loud the next note... swipe left to repeat the last note... klick once or multiple times and swipe up to delete a specific note... swipe down to stop the narrator", voiceIdentifier: bundleIdentifier)
+        }
     }
 }
 

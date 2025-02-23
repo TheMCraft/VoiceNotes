@@ -11,7 +11,7 @@ final class TextToSpeechManager: NSObject, AVSpeechSynthesizerDelegate {
         }
     }
     
-    func speak(text: String, language: String = "de-DE", voiceIdentifier: String? = nil, force: Bool = true) {
+    func speak(text: String, language: String = "en-US", voiceIdentifier: String? = nil, force: Bool = true) {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             print("Nothing to speak.")
             return
