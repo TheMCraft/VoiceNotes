@@ -14,10 +14,10 @@ struct ContentView: View {
     @State private var tapCount: Int = 0
     @State private var showInfo: Bool = false
     @State private var tutorialSpeaking: Bool = false
+    @State private var showSoundAlert: Bool = false
     @GestureState private var isDetectingLongPress: Bool = false
     
     private let bundleIdentifier: String = "com.apple.ttsbundle.siri_male_en-US_compact"
-    
     
     var body: some View {
         VStack {
@@ -103,6 +103,7 @@ struct ContentView: View {
                 )
                 .onAppear {
                     loadNotes()
+                    checkSound()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             if (showInfo) {
@@ -120,6 +121,9 @@ struct ContentView: View {
                     )
             }
         }
+        .alert(isPresented: $showSoundAlert) {
+            Alert(title: Text("You have to turn on sound"), dismissButton: .default(Text("Ok")))
+        }
     }
     
     private func saveNotes() {
@@ -135,20 +139,28 @@ struct ContentView: View {
             array = loadedArray
         }
     }
+    
     private func getMessage(numberize: Bool) -> String {
         return (numberize ? String(speakIndex + 1) + ". " : "") + array[speakIndex]
     }
     
-    func playBingSound() {
+    private func playBingSound() {
         AudioServicesPlaySystemSound(1052)
     }
-    func tutorial() {
+    
+    private func tutorial() {
         if (tutorialSpeaking) {
             textToSpeechManager.stopSpeaking()
             tutorialSpeaking = false
         } else {
             tutorialSpeaking = true
             textToSpeechManager.speak(text: "Press and hold your finger in the middle of the screen to add a new note... swipe to the right to read out loud the next note... swipe left to repeat the last note... klick once or multiple times and swipe up to delete a specific note... swipe down to stop the narrator", voiceIdentifier: bundleIdentifier)
+        }
+    }
+    
+    private func checkSound() {
+        if AVAudioSession.sharedInstance().outputVolume == 0 {
+            showSoundAlert = true
         }
     }
 }

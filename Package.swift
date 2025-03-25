@@ -17,7 +17,7 @@ let package = Package(
             name: "VoiceNotes",
             targets: ["AppModule"],
             bundleIdentifier: "at.htlklu.VoiceNotes",
-            teamIdentifier: "2WZ44K7466",
+            teamIdentifier: "99Q76NH34C",
             displayVersion: "1.0",
             bundleVersion: "1",
             appIcon: .asset("AppIcon"),
