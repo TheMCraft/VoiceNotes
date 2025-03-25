@@ -20,7 +20,7 @@ let package = Package(
             teamIdentifier: "2WZ44K7466",
             displayVersion: "1.0",
             bundleVersion: "1",
-            appIcon: .placeholder(icon: .beachball),
+            appIcon: .asset("AppIcon"),
             accentColor: .presetColor(.teal),
             supportedDeviceFamilies: [
                 .pad,
@@ -33,9 +33,10 @@ let package = Package(
                 .portraitUpsideDown(.when(deviceFamilies: [.pad]))
             ],
             capabilities: [
-                .speechRecognition(purposeString: "test"),
-                .microphone(purposeString: "test2")
-            ]
+                .speechRecognition(purposeString: "Creating Voice Memos"),
+                .microphone(purposeString: "Creating Voice Memos")
+            ],
+            appCategory: .productivity
         )
     ],
     targets: [
